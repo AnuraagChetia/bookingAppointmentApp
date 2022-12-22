@@ -5,6 +5,18 @@ const msg = document.querySelector('.msg');
 // Listen for form submit
 myForm.addEventListener('submit', onSubmit);
 
+window.addEventListener("DOMContentLoaded", () => {
+  const localStorageObj = localStorage;
+  const localstoragekeys  = Object.keys(localStorageObj)
+
+  for(var i =0; i< localstoragekeys.length; i++){
+      const key = localstoragekeys[i]
+      const userDetailsString = localStorageObj[key];
+      const userDetailsObj = JSON.parse(userDetailsString);
+      display(userDetailsObj)
+  }
+})
+
 function onSubmit(e) {
   e.preventDefault();
   
@@ -12,7 +24,6 @@ function onSubmit(e) {
     // alert('Please enter all fields');
     msg.classList.add('error');
     msg.innerHTML = 'Please enter all fields';
-
     // Remove error after 3 seconds
     setTimeout(() => msg.remove(), 3000);
   } else {
@@ -21,30 +32,32 @@ function onSubmit(e) {
       name: nameInput.value,
       email: emailInput.value
     }
-    //if there is nothing saved at the start then create an empty array
-    if(localStorage.getItem('data') == null){
-      localStorage.setItem('data','[]');
-    }
-    //get old data and push new data to it
-    let oldData = JSON.parse(localStorage.getItem('data'));
-    oldData.push(newData);
-
-    //save the old + new data
-    localStorage.setItem('data', JSON.stringify(oldData));
-
-    display();
+    //save in local storage
+    localStorage.setItem(emailInput.value, JSON.stringify(newData));
+    display(newData);
+    nameInput.value = '';
+    emailInput.value = '';
   }
 }
 
-function display(){
-  //create li element
-  var li = document.createElement('li');
-  //create a textNode with the user details
-  var liNode = document.createTextNode(`${nameInput.value} ${emailInput.value}`);
-  //append the textNode into the li
-  li.appendChild(liNode);
+function display(user){
+  const parentNode = document.getElementById('users');
+  var name = user.name;
+  const childHTML = `<li id=${user.email}> ${user.name} - ${user.email} <button onclick = deleteUser('${user.email}')>Delete</button> <button onclick = editUser('${user.email}','${name}')>Edit</button> </li> `;
+  parentNode.innerHTML = parentNode.innerHTML + childHTML;
+}
 
-  //create the container
-  var ul = document.querySelector('.items');
-  ul.appendChild(li);
+function deleteUser(emailId){
+  localStorage.removeItem(emailId);
+  removeUserFromScreen(emailId);
+}
+
+function removeUserFromScreen(emailId){
+  const node = document.getElementById(emailId);
+  node.remove();
+}
+function editUser(emailId,name){
+  document.getElementById('name').value = name;
+  document.getElementById('email').value = emailId;
+  deleteUser(emailId); 
 }
