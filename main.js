@@ -6,15 +6,25 @@ const msg = document.querySelector('.msg');
 myForm.addEventListener('submit', onSubmit);
 
 window.addEventListener("DOMContentLoaded", () => {
-  const localStorageObj = localStorage;
-  const localstoragekeys  = Object.keys(localStorageObj)
+  axios.get("https://crudcrud.com/api/4e14ae0a3fb84ebf99aca12956f032db/appointmentData")
+  .then(res => {
+    for(let i=0;i<res.data.length;i++){
+      display(res.data[i]);
+      // console.log(res);
+    }
+  })
+  .catch(err => {
+    console.error(err); 
+  })
+  // const localStorageObj = localStorage;
+  // const localstoragekeys  = Object.keys(localStorageObj)
 
-  for(var i =0; i< localstoragekeys.length; i++){
-      const key = localstoragekeys[i]
-      const userDetailsString = localStorageObj[key];
-      const userDetailsObj = JSON.parse(userDetailsString);
-      display(userDetailsObj)
-  }
+  // for(var i =0; i< localstoragekeys.length; i++){
+  //     const key = localstoragekeys[i]
+  //     const userDetailsString = localStorageObj[key];
+  //     const userDetailsObj = JSON.parse(userDetailsString);
+  //     display(userDetailsObj)
+  // }
 })
 
 function onSubmit(e) {
@@ -52,12 +62,19 @@ function onSubmit(e) {
 function display(user){
   const parentNode = document.getElementById('users');
   var name = user.name;
-  const childHTML = `<li id=${user.email}> ${user.name} - ${user.email} <button onclick = deleteUser('${user.email}')>Delete</button> <button onclick = editUser('${user.email}','${name}')>Edit</button> </li> `;
+  const childHTML = `<li id=${user.email}> ${user.name} - ${user.email} <button onclick = deleteUser('${user.email}','${user._id}')>Delete</button> <button onclick = editUser('${user.email}','${name}','${user._id}')>Edit</button> </li> `;
   parentNode.innerHTML = parentNode.innerHTML + childHTML;
 }
 
-function deleteUser(emailId){
-  localStorage.removeItem(emailId);
+function deleteUser(emailId,userID){
+  // localStorage.removeItem(emailId);
+  axios.delete(`https://crudcrud.com/api/4e14ae0a3fb84ebf99aca12956f032db/appointmentData/${userID}`)
+  .then(res => {
+    console.log('Successful')
+  })
+  .catch(err => {
+    console.error(`Error: ${err}`); 
+  })
   removeUserFromScreen(emailId);
 }
 
@@ -65,8 +82,8 @@ function removeUserFromScreen(emailId){
   const node = document.getElementById(emailId);
   node.remove();
 }
-function editUser(emailId,name){
+function editUser(emailId,name,userId){
   document.getElementById('name').value = name;
   document.getElementById('email').value = emailId;
-  deleteUser(emailId); 
+  deleteUser(emailId,userId); 
 }
