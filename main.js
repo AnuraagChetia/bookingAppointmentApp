@@ -33,8 +33,17 @@ function onSubmit(e) {
       email: emailInput.value
     }
     //save in local storage
-    localStorage.setItem(emailInput.value, JSON.stringify(newData));
-    display(newData);
+    // localStorage.setItem(emailInput.value, JSON.stringify(newData));
+    
+    //save in crud
+    axios.post("https://crudcrud.com/api/4e14ae0a3fb84ebf99aca12956f032db/appointmentData",newData)
+    .then(res => {
+      display(newData);
+    })
+    .catch(err => {
+      console.error(err); 
+    })
+    // display(newData);
     nameInput.value = '';
     emailInput.value = '';
   }
